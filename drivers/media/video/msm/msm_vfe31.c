@@ -3147,7 +3147,7 @@ void msm_camvfe_fn_init(struct msm_camvfe_fn *fptr, void *data)
 
 void msm_camvpe_fn_init(struct msm_camvpe_fn *fptr, void *data)
 {
-#ifdef CONFIG_MSM_VPE_STANDALONE
+#ifdef CONFIG_SEMC_VPE1
 	fptr->vpe_reg		= NULL;
 	fptr->send_frame_to_vpe	= NULL;
 	fptr->vpe_config	= NULL;

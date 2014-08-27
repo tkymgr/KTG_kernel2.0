@@ -854,7 +854,8 @@ static int msm_vpe_open(struct inode *inode, struct file *filep)
 	}
 	/* don't change the order of clock and irq.*/
 	CDBG("%s: enable_clock\n", __func__);
-	rc = msm_camio_vpe_clk_enable(VPE_TURBO_MODE_CLOCK_RATE);
+	rc = msm_camio_vpe_clk_enable();
+//	rc = msm_camio_vpe_clk_enable(VPE_TURBO_MODE_CLOCK_RATE);
 
 	CDBG("%s: enable_irq\n", __func__);
 	vpe_enable_irq();

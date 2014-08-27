@@ -950,7 +950,7 @@ static struct platform_device msm_gemini_device = {
 };
 #endif
 
-#if defined (CONFIG_MSM_VPE) || defined(CONFIG_MSM_VPE_STANDALONE)
+#if defined (CONFIG_MSM_VPE) || defined(CONFIG_SEMC_VPE1)
 static struct resource msm_vpe_resources[] = {
 	{
 		.start	= 0xAD200000,
@@ -972,12 +972,12 @@ static struct platform_device msm_vpe_device = {
        .resource = msm_vpe_resources,
 };
 #endif
-#ifdef CONFIG_MSM_VPE_STANDALONE
-static struct platform_device msm_vpe_standalone_device = {
-       .name = "msm_vpe_standalone",
-       .id   = 0,
-       .num_resources = ARRAY_SIZE(msm_vpe_resources),
-       .resource = msm_vpe_resources,
+#if defined(CONFIG_SEMC_VPE1)
+static struct platform_device semc_vpe1_device = {
+	.name		= "semc_vpe1",
+	.id		= 0,
+	.num_resources	= ARRAY_SIZE(msm_vpe_resources),
+	.resource	= msm_vpe_resources,
 };
 #endif
 
@@ -4168,9 +4168,10 @@ static struct platform_device *devices[] __initdata = {
 #ifdef CONFIG_MSM_VPE
 	&msm_vpe_device,
 #endif
-#ifdef CONFIG_MSM_VPE_STANDALONE
-	&msm_vpe_standalone_device,
+#if defined(CONFIG_SEMC_VPE1)
+	&semc_vpe1_device,
 #endif
+
 #ifdef CONFIG_MOGAMI_SLIDER
 	&slider_device_mogami,
 #endif
