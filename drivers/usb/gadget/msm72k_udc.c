@@ -339,7 +339,7 @@ static inline enum chg_type usb_get_chg_type(struct usb_info *ui)
 #endif /* CONFIG_SUPPORT_ALIEN_USB_CHARGER */
 }
 
-#define USB_WALLCHARGER_CHG_CURRENT 1500
+#define USB_WALLCHARGER_CHG_CURRENT 1800
 static int usb_get_max_power(struct usb_info *ui)
 {
 	struct msm_otg *otg = to_msm_otg(ui->xceiv);

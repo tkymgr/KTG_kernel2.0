@@ -41,6 +41,18 @@ endif
 obj-$(CONFIG_SMP) += headsmp.o platsmp.o
 obj-$(CONFIG_HOTPLUG_CPU) += hotplug.o
 
+ifdef CONFIG_ARCH_MSM8X60
+	obj-$(CONFIG_SIMPLE_REMOTE_PLATFORM) += simple_remote_msm8x60_pf.o
+endif
+ifdef CONFIG_ARCH_MSM8960
+	obj-$(CONFIG_PM8921_MIC_BIAS) += pm8921-mic_bias.o
+	obj-$(CONFIG_SIMPLE_REMOTE_PLATFORM) += simple_remote_msm8960_pf.o
+endif
+
+ifdef CONFIG_ARCH_MSM8X60
+	obj-$(CONFIG_PMIC8058_MIC_BIAS) += pm8058-mic_bias.o
+endif
+
 obj-$(CONFIG_MSM_CPU_AVS) += avs.o
 obj-$(CONFIG_MSM_AVS_HW) += avs_hw.o
 obj-$(CONFIG_CPU_V6) += idle-v6.o
@@ -70,7 +82,6 @@ obj-$(CONFIG_MSM_PIL_QDSP6V3) += pil-q6v3.o
 obj-$(CONFIG_MSM_PIL_QDSP6V4) += pil-q6v4.o
 obj-$(CONFIG_MSM_PIL_RIVA) += pil-riva.o
 obj-$(CONFIG_MSM_PIL_TZAPPS) += pil-tzapps.o
-obj-$(CONFIG_MSM_PIL_VIDC) += pil-vidc.o
 obj-$(CONFIG_MSM_PIL_MODEM) += pil-modem.o
 obj-$(CONFIG_ARCH_QSD8X50) += sirc.o
 obj-$(CONFIG_ARCH_FSM9XXX) += sirc-fsm9xxx.o
@@ -199,7 +210,6 @@ obj-$(CONFIG_ARCH_FSM9XXX) += dfe-fsm9xxx.o rfic-fsm9xxx.o
 obj-$(CONFIG_ARCH_FSM9XXX) += restart-fsm9xxx.o xo-fsm9xxx.o
 
 obj-$(CONFIG_MSM_WATCHDOG) += msm_watchdog.o
-obj-$(CONFIG_MSM_WATCHDOG) += msm_watchdog_asm.o
 obj-$(CONFIG_MACH_MSM8X60_RUMI3) += board-msm8x60.o
 obj-$(CONFIG_MACH_MSM8X60_SIM) += board-msm8x60.o
 obj-$(CONFIG_MACH_MSM8X60_SURF) += board-msm8x60.o
@@ -241,7 +251,31 @@ obj-$(CONFIG_MACH_MSM8960_FLUID) += board-8960-all.o board-8960-regulator.o
 obj-$(CONFIG_MACH_MSM8930_CDP) += board-8930-all.o board-8930-regulator.o
 obj-$(CONFIG_MACH_MSM8930_MTP) += board-8930-all.o board-8930-regulator.o
 obj-$(CONFIG_MACH_MSM8930_FLUID) += board-8930-all.o board-8930-regulator.o
-obj-$(CONFIG_PM8921_BMS) += bms-batterydata.o bms-batterydata-desay.o
+
+obj-$(CONFIG_MACH_SEMC_NOZOMI) += board-semc_fuji.o gpiomux-fuji_nozomi.o leds-fuji_nozomi.o charger-fuji_nozomi.o keypad-fuji_nozomi.o vreg-fuji_nozomi.o board-semc_fuji-rfkill.o nfc-fuji_nozomi.o gyro-semc_common.o gyro-semc_fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_NOZOMI_DCM) += board-semc_fuji.o gpiomux-fuji_nozomi.o leds-fuji_nozomi.o charger-fuji_nozomi.o keypad-fuji_nozomi.o vreg-fuji_nozomi.o board-semc_fuji-rfkill.o gyro-semc_common.o gyro-semc_fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_NOZOMI2) += board-semc_fuji.o gpiomux-fuji_nozomi.o leds-fuji_nozomi.o charger-fuji_nozomi.o keypad-fuji_nozomi.o vreg-fuji_nozomi.o board-semc_fuji-rfkill.o nfc-fuji_nozomi.o gyro-semc_common.o gyro-semc_fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_HIKARI) += board-semc_fuji.o gpiomux-fuji_hikari.o leds-fuji_hikari.o charger-fuji_hikari.o keypad-fuji_hikari.o vreg-fuji_hikari.o board-semc_fuji-rfkill.o felica-fuji_common.o gyro-semc_common.o gyro-semc_fuji_hikari.o
+obj-$(CONFIG_MACH_SEMC_HIKARI_ROW) += board-semc_fuji.o gpiomux-fuji_hikari_row.o leds-fuji_hikari.o charger-fuji_hikari.o keypad-fuji_hikari.o vreg-fuji_hikari_row.o board-semc_fuji-rfkill.o nfc-fuji.o gyro-semc_common.o gyro-semc_fuji_hikari.o
+obj-$(CONFIG_MACH_SEMC_HAYATE) += board-semc_fuji.o gpiomux-fuji_hayate.o leds-fuji_hayate.o charger-fuji_hayate.o keypad-fuji_hayate.o vreg-fuji_hayate.o board-semc_fuji-rfkill.o felica-fuji_common.o gyro-semc_common.o gyro-semc_fuji_hayate.o
+obj-$(CONFIG_MACH_SEMC_AOBA) += board-semc_fuji.o gpiomux-fuji_csfb_aoba.o leds-fuji_csfb_aoba.o charger-fuji_csfb_aoba.o keypad-fuji_csfb_aoba.o vreg-fuji_csfb_aoba.o mdm.o board-semc_fuji-rfkill.o nfc-fuji.o gyro-semc_common.o gyro-semc_fuji_csfb_aoba.o
+
+obj-$(CONFIG_MACH_SEMC_HIKARI) += irda-fuji_common.o
+obj-$(CONFIG_MACH_SEMC_HAYATE) += irda-fuji_common.o
+
+ifdef CONFIG_TOUCHSCREEN_CLEARPAD
+obj-$(CONFIG_MACH_SEMC_NOZOMI) += touch-fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_NOZOMI_DCM) += touch-fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_NOZOMI2) += touch-fuji_nozomi.o
+obj-$(CONFIG_MACH_SEMC_HIKARI) += touch-fuji_hikari.o
+obj-$(CONFIG_MACH_SEMC_HIKARI_ROW) += touch-fuji_hikari.o
+obj-$(CONFIG_MACH_SEMC_AOBA) += touch-fuji_csfb_aoba.o
+obj-$(CONFIG_MACH_SEMC_HAYATE) += touch-fuji_hayate.o
+endif
+obj-$(CONFIG_MACH_SEMC_HIKARI) += oneseg-fuji_common.o
+obj-$(CONFIG_MACH_SEMC_HAYATE) += oneseg-fuji_common.o
+
+obj-$(CONFIG_ARCH_MSM8960) += bms-batterydata.o
 obj-$(CONFIG_MACH_APQ8064_SIM) += board-8064-all.o board-8064-regulator.o
 obj-$(CONFIG_MACH_APQ8064_RUMI3) += board-8064-all.o board-8064-regulator.o
 obj-$(CONFIG_ARCH_MSM9615) += board-9615.o devices-9615.o board-9615-regulator.o board-9615-gpiomux.o board-9615-storage.o

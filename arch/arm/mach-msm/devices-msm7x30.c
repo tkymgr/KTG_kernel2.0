@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Google, Inc.
- * Copyright (c) 2008-2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2008-2012, Code Aurora Forum. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -98,6 +98,7 @@ static struct resource resources_uart2[] = {
 		.start	= MSM_UART2_PHYS,
 		.end	= MSM_UART2_PHYS + MSM_UART2_SIZE - 1,
 		.flags	= IORESOURCE_MEM,
+		.name  = "uart_resource"
 	},
 };
 
@@ -106,7 +107,6 @@ static struct resource resources_uart3[] = {
 		.start	= INT_UART3,
 		.end	= INT_UART3,
 		.flags	= IORESOURCE_IRQ,
-		.name  = "uart_resource"
 	},
 	{
 		.start	= MSM_UART3_PHYS,
@@ -566,7 +566,9 @@ struct platform_device msm_device_otg = {
 };
 
 struct flash_platform_data msm_nand_data = {
-	.version = VERSION_2,
+	.parts		= NULL,
+	.nr_parts	= 0,
+	.interleave     = 0,
 };
 
 struct platform_device msm_device_nand = {
@@ -579,67 +581,9 @@ struct platform_device msm_device_nand = {
 	},
 };
 
-static struct resource smd_resource[] = {
-	{
-		.name   = "a9_m2a_0",
-		.start  = INT_A9_M2A_0,
-		.flags  = IORESOURCE_IRQ,
-	},
-	{
-		.name   = "a9_m2a_5",
-		.start  = INT_A9_M2A_5,
-		.flags  = IORESOURCE_IRQ,
-	},
-	{
-		.name   = "adsp_a11_smsm",
-		.start  = INT_ADSP_A11,
-		.flags  = IORESOURCE_IRQ,
-	},
-};
-
-static struct smd_subsystem_config smd_config_list[] = {
-	{
-		.irq_config_id = SMD_MODEM,
-		.subsys_name = "modem",
-		.edge = SMD_APPS_MODEM,
-
-		.smd_int.irq_name = "a9_m2a_0",
-		.smd_int.flags = IRQF_TRIGGER_RISING,
-		.smd_int.irq_id = -1,
-		.smd_int.device_name = "smd_dev",
-		.smd_int.dev_id = 0,
-
-		.smd_int.out_bit_pos =  1 << 0,
-		.smd_int.out_base = (void __iomem *)MSM_GCC_BASE,
-		.smd_int.out_offset = 0x8,
-
-		.smsm_int.irq_name = "a9_m2a_5",
-		.smsm_int.flags = IRQF_TRIGGER_RISING,
-		.smsm_int.irq_id = -1,
-		.smsm_int.device_name = "smd_dev",
-		.smsm_int.dev_id = 0,
-
-		.smsm_int.out_bit_pos =  1 << 5,
-		.smsm_int.out_base = (void __iomem *)MSM_GCC_BASE,
-		.smsm_int.out_offset = 0x8,
-
-	}
-};
-
-static struct smd_platform smd_platform_data = {
-	.num_ss_configs = ARRAY_SIZE(smd_config_list),
-	.smd_ss_configs = smd_config_list,
-};
-
 struct platform_device msm_device_smd = {
 	.name	= "msm_smd",
 	.id	= -1,
-	.resource = smd_resource,
-	.num_resources = ARRAY_SIZE(smd_resource),
-	.dev = {
-		.platform_data = &smd_platform_data,
-	}
-
 };
 
 static struct resource msm_dmov_resource[] = {
@@ -711,8 +655,8 @@ static struct resource resources_sdc2[] = {
 	},
 	{
 		.name	= "sdcc_dma_chnl",
-		.start	= DMOV_NAND_CHAN,
-		.end	= DMOV_NAND_CHAN,
+		.start	= DMOV_SDC2_CHAN,
+		.end	= DMOV_SDC2_CHAN,
 		.flags	= IORESOURCE_DMA,
 	},
 	{
@@ -1079,6 +1023,7 @@ static struct msm_rotator_platform_data rotator_pdata = {
 	.number_of_clocks = ARRAY_SIZE(rotator_clocks),
 	.hardware_version_number = 0x1000303,
 	.rotator_clks = rotator_clocks,
+	.regulator_name = "fs_rot",
 };
 
 struct platform_device msm_rotator_device = {

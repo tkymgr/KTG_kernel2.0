@@ -1,4 +1,4 @@
-/* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -42,8 +42,9 @@
 #include "timer.h"
 
 #define DRV_NAME	"msm_dsps"
-#define DRV_VERSION	"3.03"
+#define DRV_VERSION	"3.02"
 
+#define PPSS_PAUSE_REG	0x1804
 
 #define PPSS_TIMER0_32KHZ_REG	0x1004
 #define PPSS_TIMER0_20MHZ_REG	0x0804
@@ -120,29 +121,23 @@ static void dsps_unload(void)
 
 /**
  *  Suspend DSPS CPU.
- *
- * Only call if dsps_pwr_ctl_en is false.
- * If dsps_pwr_ctl_en is true, then DSPS will control its own power state.
  */
 static void dsps_suspend(void)
 {
 	pr_debug("%s.\n", __func__);
 
-	writel_relaxed(1, drv->ppss_base + drv->pdata->ppss_pause_reg);
+	writel_relaxed(1, drv->ppss_base + PPSS_PAUSE_REG);
 	mb(); /* Make sure write commited before ioctl returns. */
 }
 
 /**
  *  Resume DSPS CPU.
- *
- * Only call if dsps_pwr_ctl_en is false.
- * If dsps_pwr_ctl_en is true, then DSPS will control its own power state.
  */
 static void dsps_resume(void)
 {
 	pr_debug("%s.\n", __func__);
 
-	writel_relaxed(0, drv->ppss_base + drv->pdata->ppss_pause_reg);
+	writel_relaxed(0, drv->ppss_base + PPSS_PAUSE_REG);
 	mb(); /* Make sure write commited before ioctl returns. */
 }
 
@@ -393,10 +388,8 @@ static long dsps_ioctl(struct file *file,
 
 	switch (cmd) {
 	case DSPS_IOCTL_ON:
-		if (!drv->pdata->dsps_pwr_ctl_en) {
-			ret = dsps_power_on_handler();
-			dsps_resume();
-		}
+		ret = dsps_power_on_handler();
+		dsps_resume();
 		break;
 	case DSPS_IOCTL_OFF:
 		if (!drv->pdata->dsps_pwr_ctl_en) {
@@ -571,8 +564,7 @@ static int dsps_open(struct inode *ip, struct file *fp)
 			return ret;
 		}
 
-		if (!drv->pdata->dsps_pwr_ctl_en)
-			dsps_resume();
+		dsps_resume();
 	}
 	drv->ref_count++;
 

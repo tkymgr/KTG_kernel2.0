@@ -126,7 +126,6 @@ config ARCH_MSM8X60
 	select MSM_SPM_V1
 	select MSM_SCM if SMP
 	select MULTI_IRQ_HANDLER
-	select MSM_MULTIMEDIA_USE_ION
 	select MSM_PM8X60 if PM
 
 config ARCH_MSM8960
@@ -168,7 +167,6 @@ config ARCH_MSM8960
 	select MULTI_IRQ_HANDLER
 	select MSM_PM8X60 if PM
 	select HOLES_IN_ZONE if SPARSEMEM
-	select MSM_KRAIT_WFE_FIXUP
 
 config ARCH_MSM8930
 	bool "MSM8930"
@@ -206,7 +204,6 @@ config ARCH_MSM8930
 	select MULTI_IRQ_HANDLER
 	select MSM_PM8X60 if PM
 	select HOLES_IN_ZONE if SPARSEMEM
-	select MSM_KRAIT_WFE_FIXUP
 
 config ARCH_APQ8064
 	bool "APQ8064"
@@ -224,7 +221,6 @@ config ARCH_APQ8064
 	select MULTI_IRQ_HANDLER
 	select MSM_PM8X60 if PM
 	select HOLES_IN_ZONE if SPARSEMEM
-	select MSM_KRAIT_WFE_FIXUP
 
 config ARCH_MSMCOPPER
 	bool "MSM Copper"
@@ -261,10 +257,6 @@ config ARCH_MSM9615
 	select MSM_RPM_REGULATOR
 	select MULTI_IRQ_HANDLER
 	select MSM_PM8X60 if PM
-	select MSM_XO
-	select MSM_QDSP6_APR
-	select MSM_AUDIO_QDSP6 if SND_SOC
-	select FIQ
 
 endmenu
 
@@ -313,9 +305,6 @@ config  ARCH_MSM_SCORPIONMP
 config  ARCH_MSM_KRAITMP
 	select ARCH_MSM_KRAIT
 	select MSM_SMP
-	bool
-
-config  MSM_KRAIT_WFE_FIXUP
 	bool
 
 config  ARCH_MSM_CORTEX_A5
@@ -709,6 +698,55 @@ config MACH_MSM8X60_DRAGON
 	help
 	  Support for the Qualcomm MSM8x60 Dragon board.
 
+config MACH_SEMC_NOZOMI
+	depends on ARCH_MSM8X60
+	default n
+	bool "SEMC Nozomi"
+	help
+	  Support for the Sony Ericsson Nozomi.
+
+config MACH_SEMC_NOZOMI_DCM
+        depends on ARCH_MSM8X60
+        default n
+        bool "SEMC Nozomi_dcm"
+        help
+          Support for the Sony Ericsson Nozomi_dcm.
+
+config MACH_SEMC_NOZOMI2
+	depends on ARCH_MSM8X60
+	default n
+	bool "SEMC Nozomi2"
+	help
+	  Support for the Sony Ericsson Nozomi2.
+
+config MACH_SEMC_HIKARI
+	depends on ARCH_MSM8X60
+	default n
+	bool "SEMC Hikari"
+	help
+	  Support for the Sony Ericsson Hikari.
+
+config MACH_SEMC_HIKARI_ROW
+        depends on ARCH_MSM8X60
+        default n
+        bool "SEMC Hikari_row"
+        help
+          Support for the Sony Ericsson Hikari_row.
+
+config MACH_SEMC_AOBA
+	depends on ARCH_MSM8X60
+	default n
+	bool "SEMC Aoba"
+	help
+	  Support for the Sony Ericsson Aoba.
+
+config MACH_SEMC_HAYATE
+	depends on ARCH_MSM8X60
+	default n
+	bool "SEMC Hayate"
+	help
+	  Support for the Sony Ericsson Hayate.
+
 config MACH_MSM8960_SIM
 	depends on ARCH_MSM8960
 	bool "MSM8960 Simulator"
@@ -954,6 +992,20 @@ choice
 endchoice
 
 choice
+	prompt "GSBI debug console"
+	default MSM_DEBUG_CONSOLE_GSBI5
+	help
+	  This option sets which gsbi port that should be used as debug console.
+
+config MSM_DEBUG_CONSOLE_GSBI5
+        bool "GSBI5"
+
+config MSM_DEBUG_CONSOLE_GSBI8
+        bool "GSBI8"
+
+endchoice
+
+choice
 	prompt "Default Timer"
 	default MSM7X00A_USE_GP_TIMER
 
@@ -1196,7 +1248,7 @@ config MSM_SMD_DEBUG
 	  between the ARM9 and ARM11
 
 config MSM_SDIO_AL
-	depends on ((ARCH_MSM7X30 || MACH_MSM8X60_FUSN_FFA || MACH_TYPE_MSM8X60_FUSION) && HAS_WAKELOCK)
+	depends on ((ARCH_MSM7X30 || MACH_MSM8X60_FUSN_FFA || MACH_TYPE_MSM8X60_FUSION || MACH_SEMC_AOBA) && HAS_WAKELOCK)
 	default y
 	tristate "SDIO-Abstraction-Layer"
 	help
@@ -1795,12 +1847,6 @@ config MSM_PIL_TZAPPS
 	  used to decrypt data and perform secure operations on the behalf of
 	  the kernel.
 
-config MSM_PIL_VIDC
-	tristate "Video Core Boot Support"
-	depends on MSM_PIL
-	help
-	  Support for authenticating the video core image.
-
 config MSM_SCM
 	bool "Secure Channel Manager (SCM) support"
 	default n
@@ -2141,11 +2187,41 @@ config MSM_STANDALONE_POWER_COLLAPSE
        bool "Enable standalone power collapse"
        default n
 
+config MSM_GSBI5_UART
+	bool "Enable GSBI5 UART device"
+	default n
+	help
+	  This enables GSBI5 configured into UART.
+
+config MSM_GSBI7_UART
+	bool "Enable GSBI7 UART device"
+	default n
+	help
+	  This enables GSBI7 configured into UART.
+
+config MSM_GSBI5_I2C
+	bool "Enable GSBI5 I2C device"
+	default n
+	help
+	  This enables GSBI5 configured into I2C.
+
 config MSM_GSBI9_UART
 	bool "Enable GSBI9 UART device"
 	default n
 	help
 	  This enables GSBI9 configured into UART.
+
+config MSM_GSBI10_UART
+	bool "Enable GSBI10 UART device"
+	default n
+	help
+	  This enables GSBI10 configured into UART.
+
+config MSM_GSBI12_UART
+	bool "Enable GSBI12 UART device"
+	default n
+	help
+	  This enables GSBI12 configured into UART.
 
 config MSM_SHARED_GPIO_FOR_UART2DM
 	bool "Use shared GPIOs into UART mode"
@@ -2270,12 +2346,41 @@ config MSM_RTB_SEPARATE_CPUS
 	  separately. This will guarantee that the last acesses for each cpu
 	  will be logged but there will be fewer entries per cpu
 
+config PM8921_MIC_BIAS
+        bool "pm8921 mic bias driver"
+        default n
+        help
+          Provides support for activate pm8921 mic bias driver used for
+          primary and secondary mic.
+
+choice
+    prompt "SWIQI"
+    optional
+    default n
+    config SEMC_SWIQI
+        bool "Enable SWIQI"
+        help
+          This enables SWIQI.
+
+    config SONY_SWIQI2
+        bool "Enable SWIQI2"
+        help
+          This enables SWIQI2.
+endchoice
+
 config SIMPLE_REMOTE_PLATFORM
         bool "Simple Remote platform specific driver"
         default n
         help
           Provides support for detecting 3.5mm audio jack, such as wired
           headset. This is the platform specific layer.
+
+config GPIO_SLIDER
+        bool "GPIO slider"
+        depends on INPUT_GPIO
+        default n
+        help
+          Select if GPIO slider switch is attached.
 
 config SIMPLE_REMOTE_INVERT_PLUG_DETECTION_STATE
 	bool "Invert state of plug detection"
@@ -2285,6 +2390,12 @@ config SIMPLE_REMOTE_INVERT_PLUG_DETECTION_STATE
 	  currently the plug detection state was low state when headphone
 	  was inserted, but it is high state on some products, so that
 	  we need invert this state on these products.
+
+config MMC_MSM_POWER_SUPPLY_SDC3_VIA_MPP04
+	bool "PMIC MPP04"
+	default n
+	help
+	  The power supply for uSD is controlled via MPP04(GPIO)
 
 config SEMC_CHARGER_USB_ARCH
 	bool "Support USB interface for charger"
@@ -2297,6 +2408,27 @@ config SEMC_CHARGER_CRADLE_ARCH
        default n
        help
 	  This enables cradle for charging.
+
+config FUJI_PMIC_KEYPAD
+	bool "Fuji PMIC Keypad"
+	depends on ARCH_MSM8X60
+	default n
+	help
+	  This enables Fuji PMIC Keypad support.
+
+config FUJI_GPIO_KEYPAD
+	bool "Enable Fuji gpio keypad support"
+	depends on ARCH_MSM8X60
+	default n
+	help
+	  This enables the Fuji gpio keypad support.
+
+config PMIC8058_MIC_BIAS
+	bool "pmic8058 mic bias driver"
+	default n
+	help
+	  Provides support for activate pm8058 mic bias driver used for
+	  primary and secondary mic.
 
 config MSM_CACHE_ERP
 	bool "Cache / CPU error reporting"
@@ -2319,32 +2451,10 @@ config MSM_L1_ERR_PANIC
 
 	  For production builds, you should probably say 'N' here.
 
-config MSM_L2_ERP_PRINT_ACCESS_ERRORS
-	bool "Report L2 master port slave/decode errors in kernel log"
-	depends on MSM_CACHE_ERP
-	help
-	  Master port errors can occur when a memory request is not properly
-	  handled by the destination slave. This can occur if the destination
-	  register does not exist or is inaccessible due to security
-	  restrictions or (in some cases) clock configuration. Enabling this
-	  option will cause a backtrace to be printed to the kernel log whenever
-	  such an error is encountered. Note that the error is reported as an
-	  interrupt rather than as an exception, meaning that the backtrace may
-	  have some skid. This option may help with debugging, though production
-	  builds should probably say 'N' here.
-config MSM_L1_ERR_LOG
-	bool "Log CPU ERP events to system memory"
-	depends on MSM_CACHE_ERP
-	help
-	  Enable logging CPU ERP events to an area of memory that will be
-	  preserved across a system reset. This may be useful for detecting and
-	  troubleshooting ERP-related system crashes in the field.
-
-	  For production builds, you may want to say 'Y' here.
 
 config MSM_L2_ERP_PORT_PANIC
 	bool "Panic on L2 master port errors"
-	depends on MSM_CACHE_ERP && MSM_L2_ERP_PRINT_ACCESS_ERRORS
+	depends on MSM_CACHE_ERP
 	help
 	  Master port errors can occur when a memory request is not properly
 	  handled by the destination slave. Enable this option to catch drivers
@@ -2383,26 +2493,6 @@ config MSM_CACHE_DUMP
 	  This allows for analysis of the caches in case cache corruption is
 	  suspected.
 
-config MSM_UNDERVOLT_LCD
-	bool "Undervolt LCD"
-	help
-	  Undervolt LCD from 2850 to 2300 mV to reduce energy consumption
-
-config MSM_UNDERVOLT_PROXIMITY
-	bool "Undervolt proximity sensor"
-	help
-	  Undervolt proximity sensor from 2900 to 2400 mV to reduce energy consumption
-
-config MSM_UNDERVOLT_WIFI
-	bool "Undervolt Wi-Fi"
-	help
-	  Undervolt Wi-Fi from 2750/2850 to 2050/2150 mV to reduce energy consumption
-
-config MSM_UNDERVOLT_TOUCH
-	bool "Undervolt touch panel"
-	help
-	  Undervolt touch panel from 3050 to 2800 mV to reduce energy consumption
-
 config MSM_DCVS
 	bool "Use MSM DCVS for CPU/GPU Frequency control"
 	depends on MSM_SCM
@@ -2411,21 +2501,5 @@ config MSM_DCVS
 	  The DCVS manager allows idle driver to feed the idle information to the
 	  algorithm and the algorithm returns a frequency for the core which is
 	  passed to the frequency change driver.
-
-config MSM_CACHE_DUMP
-	bool "Cache dumping support"
-	help
-	  Add infrastructure to dump the L1 and L2 caches to an allocated buffer.
-	  This allows for analysis of the caches in case cache corruption is
-	  suspected.
-
-config MSM_CACHE_DUMP_ON_PANIC
-	bool "Dump caches on panic"
-	depends on MSM_CACHE_DUMP
-	help
-	  By default, the caches are flushed on panic. This means that trying to
-	  look at them in a RAM dump will give useless data. Select this if you
-	  want to dump the L1 and L2 caches on panic before any flush occurs.
-	  If unsure, say N
 
 endif

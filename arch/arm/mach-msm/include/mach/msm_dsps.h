@@ -87,7 +87,6 @@ struct msm_dsps_platform_data {
 	int regs_num;
 	int dsps_pwr_ctl_en;
 	void (*init)(struct msm_dsps_platform_data *data);
-	int ppss_pause_reg;
 	u32 signature;
 };
 

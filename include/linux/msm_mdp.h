@@ -330,9 +330,9 @@ enum {
 };
 
 /*
- * mdp_histogram_start_req is used to provide the parameters for
- * histogram start request
- */
+mdp_histogram_start_req is used to provide the parameters for
+histogram start request
+*/
 
 struct mdp_histogram_start_req {
 	uint32_t block;
@@ -341,10 +341,14 @@ struct mdp_histogram_start_req {
 	uint8_t num_bins;
 };
 
+
 /*
- * mdp_histogram_data is used to return the histogram data, once
- * the histogram is done/stopped/cance
+
+   mdp_histogram_data is used to return the histogram data, once
+   the histogram is done/stopped/cance
+
  */
+
 
 struct mdp_histogram_data {
 	uint32_t block;
@@ -391,6 +395,7 @@ enum {
 	mdp_lut_max,
 };
 
+
 struct mdp_igc_lut_data {
 	uint32_t block;
 	uint32_t len, ops;
@@ -422,6 +427,7 @@ struct mdp_hist_lut_data {
 	uint32_t len;
 	uint32_t *data;
 };
+
 
 struct mdp_lut_cfg_data {
 	uint32_t lut_type;

@@ -1,4 +1,4 @@
-/* Copyright (c) 2008-2011, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2008-2011, Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -76,7 +76,6 @@ struct smd_pkt_dev {
 	struct wake_lock pa_wake_lock;		/* Packet Arrival Wake lock*/
 	struct work_struct packet_arrival_work;
 	struct spinlock pa_spinlock;
-	int wakelock_locked;
 } *smd_pkt_devp[NUM_SMD_PKT_PORTS];
 
 struct class *smd_pkt_classp;
@@ -182,17 +181,13 @@ static void loopback_probe_worker(struct work_struct *work)
 static void packet_arrival_worker(struct work_struct *work)
 {
 	struct smd_pkt_dev *smd_pkt_devp;
-	unsigned long flags;
 
 	smd_pkt_devp = container_of(work, struct smd_pkt_dev,
 				    packet_arrival_work);
 	mutex_lock(&smd_pkt_devp->ch_lock);
-	spin_lock_irqsave(&smd_pkt_devp->pa_spinlock, flags);
-	if (smd_pkt_devp->ch && smd_pkt_devp->wakelock_locked) {
+	if (smd_pkt_devp->ch)
 		wake_lock_timeout(&smd_pkt_devp->pa_wake_lock,
 				  WAKELOCK_TIMEOUT);
-	}
-	spin_unlock_irqrestore(&smd_pkt_devp->pa_spinlock, flags);
 	mutex_unlock(&smd_pkt_devp->ch_lock);
 }
 
@@ -319,7 +314,6 @@ wait_for_packet:
 	if (smd_pkt_devp->poll_mode &&
 	    !smd_cur_packet_size(smd_pkt_devp->ch)) {
 		wake_unlock(&smd_pkt_devp->pa_wake_lock);
-		smd_pkt_devp->wakelock_locked = 0;
 		smd_pkt_devp->poll_mode = 0;
 	}
 	spin_unlock_irqrestore(&smd_pkt_devp->pa_spinlock, flags);
@@ -447,11 +441,10 @@ static void check_and_wakeup_reader(struct smd_pkt_dev *smd_pkt_devp)
 	}
 
 	/* here we have a packet of size sz ready */
+	wake_up(&smd_pkt_devp->ch_read_wait_queue);
 	spin_lock_irqsave(&smd_pkt_devp->pa_spinlock, flags);
 	wake_lock(&smd_pkt_devp->pa_wake_lock);
-	smd_pkt_devp->wakelock_locked = 1;
 	spin_unlock_irqrestore(&smd_pkt_devp->pa_spinlock, flags);
-	wake_up(&smd_pkt_devp->ch_read_wait_queue);
 	schedule_work(&smd_pkt_devp->packet_arrival_work);
 	D(KERN_ERR "%s: after wake_up\n", __func__);
 }
@@ -611,15 +604,15 @@ int smd_pkt_open(struct inode *inode, struct file *file)
 	if (!smd_pkt_devp)
 		return -EINVAL;
 
+	wake_lock_init(&smd_pkt_devp->pa_wake_lock, WAKE_LOCK_SUSPEND,
+			smd_pkt_dev_name[smd_pkt_devp->i]);
+	INIT_WORK(&smd_pkt_devp->packet_arrival_work, packet_arrival_worker);
+
 	file->private_data = smd_pkt_devp;
 
 	mutex_lock(&smd_pkt_devp->ch_lock);
 	if (smd_pkt_devp->ch == 0) {
 
-		wake_lock_init(&smd_pkt_devp->pa_wake_lock, WAKE_LOCK_SUSPEND,
-				smd_pkt_dev_name[smd_pkt_devp->i]);
-		INIT_WORK(&smd_pkt_devp->packet_arrival_work,
-				packet_arrival_worker);
 		if (smd_ch_edge[smd_pkt_devp->i] == SMD_APPS_MODEM)
 			peripheral = "modem";
 		else if (smd_ch_edge[smd_pkt_devp->i] == SMD_APPS_QDSP)
@@ -699,11 +692,10 @@ release_pil:
 	if (peripheral && (r < 0))
 		pil_put(smd_pkt_devp->pil);
 out:
-	if (!smd_pkt_devp->ch)
-		wake_lock_destroy(&smd_pkt_devp->pa_wake_lock);
-
 	mutex_unlock(&smd_pkt_devp->ch_lock);
 
+	if (r < 0)
+		wake_lock_destroy(&smd_pkt_devp->pa_wake_lock);
 
 	return r;
 }
@@ -731,7 +723,6 @@ int smd_pkt_release(struct inode *inode, struct file *file)
 
 	smd_pkt_devp->has_reset = 0;
 	smd_pkt_devp->do_reset_notification = 0;
-	smd_pkt_devp->wakelock_locked = 0;
 	wake_lock_destroy(&smd_pkt_devp->pa_wake_lock);
 
 	return r;
@@ -795,7 +786,6 @@ static int __init smd_pkt_init(void)
 		init_waitqueue_head(&smd_pkt_devp[i]->ch_write_wait_queue);
 		smd_pkt_devp[i]->is_open = 0;
 		smd_pkt_devp[i]->poll_mode = 0;
-		smd_pkt_devp[i]->wakelock_locked = 0;
 		init_waitqueue_head(&smd_pkt_devp[i]->ch_opened_wait_queue);
 
 		spin_lock_init(&smd_pkt_devp[i]->pa_spinlock);

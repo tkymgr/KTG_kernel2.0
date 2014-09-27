@@ -152,7 +152,6 @@ struct msm_panel_info {
 	__u32 clk_max;
 	__u32 frame_count;
 	__u32 is_3d_panel;
-	__u32 frame_rate;
 
 	/* physical size in mm */
 	__u32 width;
@@ -183,7 +182,6 @@ struct msm_fb_panel_data {
 	int (*controller_on_panel_on) (struct platform_device *pdev);
 	int (*off) (struct platform_device *pdev);
 	int (*power_ctrl) (boolean enable);
-//	void (*window_adjust)(u16 x1, u16 x2, u16 y1, u16 y2);
 	int power_on_panel_at_pan;
 	struct platform_device *next;
 	int (*clk_func) (int enable);

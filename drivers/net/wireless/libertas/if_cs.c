@@ -788,6 +788,7 @@ static void if_cs_release(struct pcmcia_device *p_dev)
 	lbs_deb_leave(LBS_DEB_CS);
 }
 
+
 static int if_cs_ioprobe(struct pcmcia_device *p_dev, void *priv_data)
 {
 	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;

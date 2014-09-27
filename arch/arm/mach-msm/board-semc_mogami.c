@@ -259,7 +259,7 @@ static int vreg_helper_on(const char *pzName, unsigned mv)
 
 	reg = vreg_get(NULL, pzName);
 	if (IS_ERR(reg)) {
-		printk(KERN_ERR "Unable to resolve VREG name \"%s\"\n", pzName);
+		pr_err("Unable to resolve VREG name \"%s\"\n", pzName);
 		return rc;
 	}
 
@@ -267,17 +267,17 @@ static int vreg_helper_on(const char *pzName, unsigned mv)
 		rc = vreg_set_level(reg, mv);
 
 	if (rc) {
-		printk(KERN_ERR "Unable to set vreg \"%s\" level\n", pzName);
+		pr_err("Unable to set vreg \"%s\" level\n", pzName);
 		return rc;
 	}
 
 	rc = vreg_enable(reg);
 	if (rc) {
-		printk(KERN_ERR "Unable to enable vreg \"%s\" level\n", pzName);
+		pr_err("Unable to enable vreg \"%s\" level\n", pzName);
 		return rc;
 	}
 
-	printk(KERN_INFO "Enabled VREG \"%s\" at %u mV\n", pzName, mv);
+	pr_info("Enabled VREG \"%s\" at %u mV\n", pzName, mv);
 	return rc;
 }
 
@@ -288,18 +288,18 @@ static void vreg_helper_off(const char *pzName)
 
 	reg = vreg_get(NULL, pzName);
 	if (IS_ERR(reg)) {
-		printk(KERN_ERR "Unable to resolve VREG name \"%s\"\n", pzName);
+		pr_err("Unable to resolve VREG name \"%s\"\n", pzName);
 		return;
 	}
 
 	rc = vreg_disable(reg);
 	if (rc) {
-		printk(KERN_ERR "Unable to disable vreg \"%s\" level\n",
+		pr_err("Unable to disable vreg \"%s\" level\n",
 			pzName);
 		return;
 	}
 
-	printk(KERN_INFO "Disabled VREG \"%s\"\n", pzName);
+	pr_info("Disabled VREG \"%s\"\n", pzName);
 }
 
 static ssize_t hw_id_get_mask(struct class *class, struct class_attribute *attr, char *buf)
@@ -314,23 +314,17 @@ static ssize_t hw_id_get_mask(struct class *class, struct class_attribute *attr,
 				GPIO_CFG_NO_PULL, GPIO_CFG_2MA);
 		rc = gpio_tlmm_config(cfg, GPIO_CFG_ENABLE);
 		if (rc) {
-			printk(KERN_ERR
-				"%s: Enabling of GPIO failed. "
-				"gpio_tlmm_config(%#x, enable)=%d\n",
-				__func__, cfg, rc);
+			pr_err("%s: Enabling of GPIO failed. gpio_tlmm_config(%#x, enable)=%d\n", __func__, cfg, rc);
 			return rc;
 		}
 		hwid |= (gpio_get_value(hw_id_gpios[i]) & 1) << i;
 		rc = gpio_tlmm_config(cfg, GPIO_CFG_DISABLE);
 		if (rc) {
-			printk(KERN_INFO
-				"%s: Disabling of GPIO failed. "
-				"The got GPIO value is valid. "
-				"gpio_tlmm_config(%#x, disable)=%d\n",
-				__func__, cfg, rc);
+			pr_info("%s: Disabling of GPIO failed. The got GPIO value is valid. "
+				"gpio_tlmm_config(%#x, disable)=%d\n", __func__, cfg, rc);
 		}
 	}
-	printk(KERN_INFO "Board Mogami HW ID: 0x%02x\n", hwid);
+	pr_err("Board Mogami HW ID: 0x%02x\n", hwid);
 	return sprintf(buf, "0x%02x\n", hwid);
 }
 
@@ -341,13 +335,12 @@ static void __init hw_id_class_init(void)
 	int error;
 	error = class_register(&hwid_class);
 	if (error) {
-		printk(KERN_ERR "%s: class_register failed\n", __func__);
+		pr_err("%s: class_register failed\n", __func__);
 		return;
 	}
 	error = class_create_file(&hwid_class, &class_attr_hwid);
 	if (error) {
-		printk(KERN_ERR "%s: class_create_file failed\n",
-		__func__);
+		pr_err("%s: class_create_file failed\n", __func__);
 		class_unregister(&hwid_class);
 	}
 }
@@ -449,8 +442,7 @@ static int __init msm_pmic_pwr_key_init(void)
 {
 	input_dev_pwr_key = input_allocate_device();
 	if (!input_dev_pwr_key) {
-		printk(KERN_ERR "%s: Error, unable to alloc pwr key device\n",
-			__func__);
+		pr_err("%s: Error, unable to alloc pwr key device\n", __func__);
 		return -1;
 	}
 	input_dev_pwr_key->name = "msm_pmic_pwr_key";
@@ -458,8 +450,7 @@ static int __init msm_pmic_pwr_key_init(void)
 	input_set_capability(input_dev_pwr_key, EV_KEY, KEY_POWER);
 	input_set_capability(input_dev_pwr_key, EV_KEY, KEY_END);
 	if (input_register_device(input_dev_pwr_key)) {
-		printk(KERN_ERR "%s: Error, unable to reg pwr key device\n",
-			__func__);
+		pr_err("%s: Error, unable to reg pwr key device\n", __func__);
 		input_free_device(input_dev_pwr_key);
 		return -1;
 	}
@@ -822,7 +813,7 @@ struct msm_camera_device_platform_data msm_camera_device_data = {
 	.ioclk.vfe_clk_rate  = 192000000,
 #else
 	.ioclk.mclk_clk_rate = 24000000,
-	.ioclk.vfe_clk_rate  = 147456000,
+	.ioclk.vfe_clk_rate  = 122880000,
 #endif
 };
 
@@ -995,17 +986,13 @@ static int __init snddev_poweramp_gpio_init(void)
 	pr_info("snddev_poweramp_gpio_init \n");
 	rc = gpio_tlmm_config(audio_pamp_gpio_config, GPIO_CFG_ENABLE);
 	if (rc) {
-		printk(KERN_ERR
-			"%s: gpio_tlmm_config(%#x)=%d\n",
-			__func__, audio_pamp_gpio_config, rc);
+		pr_err("%s: gpio_tlmm_config(%#x)=%d\n", __func__, audio_pamp_gpio_config, rc);
 	}
 
 	/* Enabling HAC amplifier */
 	rc = gpio_tlmm_config(HAC_amp_gpio_config, GPIO_CFG_ENABLE);
 	if (rc) {
-		printk(KERN_ERR
-			"%s: gpio_tlmm_config(%#x)=%d\n",
-			__func__, HAC_amp_gpio_config, rc);
+		pr_err("%s: gpio_tlmm_config(%#x)=%d\n", __func__, HAC_amp_gpio_config, rc);
 	}
 
 
@@ -1108,9 +1095,7 @@ static int __init aux_pcm_gpio_init(void)
 		rc = gpio_tlmm_config(aux_pcm_gpio_on[pin],
 					GPIO_CFG_ENABLE);
 		if (rc) {
-			printk(KERN_ERR
-				"%s: gpio_tlmm_config(%#x)=%d\n",
-				__func__, aux_pcm_gpio_on[pin], rc);
+			pr_err("%s: gpio_tlmm_config(%#x)=%d\n", __func__, aux_pcm_gpio_on[pin], rc);
 		}
 	}
 	return rc;
@@ -1281,14 +1266,10 @@ static u8 read_bahama_ver(void)
 
 	rc = marimba_read_bit_mask(&config, 0x00,  &bahama_version, 1, 0x1F);
 	if (rc < 0) {
-		printk(KERN_ERR
-			 "%s: version read failed: %d\n",
-			__func__, rc);
-			return rc;
+		pr_err("%s: version read failed: %d\n", __func__, rc);
+		return rc;
 	} else {
-		printk(KERN_INFO
-		"%s: version read got: 0x%x\n",
-		__func__, bahama_version);
+		pr_info("%s: version read got: 0x%x\n", __func__, bahama_version);
 	}
 
 	switch (bahama_version) {
@@ -1327,19 +1308,15 @@ static unsigned int msm_bahama_core_config(int type)
 					sizeof(v20_init[i].value),
 					v20_init[i].mask);
 				if (rc < 0) {
-					printk(KERN_ERR
-						"%s: reg %d write failed: %d\n",
-						__func__, v20_init[i].reg, rc);
+					pr_err("%s: reg %d write failed: %d\n", __func__, v20_init[i].reg, rc);
 					return rc;
 				}
-				printk(KERN_INFO "%s: reg 0x%02x value 0x%02x"
-					" mask 0x%02x\n",
-					__func__, v20_init[i].reg,
-					v20_init[i].value, v20_init[i].mask);
+				pr_info("%s: reg 0x%02x value 0x%02x mask 0x%02x\n",
+					__func__, v20_init[i].reg, v20_init[i].value, v20_init[i].mask);
 			}
 		}
 	}
-	printk(KERN_INFO "core type: %d\n", type);
+	pr_info("core type: %d\n", type);
 
 	return rc;
 }
@@ -1438,9 +1415,8 @@ static int bahama_present(void)
 
 	case TIMPANI_ID:
 	default:
-	printk(KERN_ERR "%s: unexpected adie connectivity type: %d\n",
-			__func__, id);
-	return -ENODEV;
+		pr_err("%s: unexpected adie connectivity type: %d\n", __func__, id);
+		return -ENODEV;
 	}
 }
 
@@ -2196,8 +2172,7 @@ static int hdmi_sii_panel_power(int on)
 		rc = msm_gpios_request_enable(sii9024_gpio_config_data_enable,
 				ARRAY_SIZE(sii9024_gpio_config_data_enable));
 		if (rc < 0) {
-			printk(KERN_ERR "%s: gpio config failed: %d\n",
-				__func__, rc);
+			pr_err("%s: gpio config failed: %d\n", __func__, rc);
 			return rc;
 		}
 	} else {
@@ -2211,15 +2186,13 @@ static int hdmi_sii_panel_power(int on)
 	vreg_ldo23 = vreg_get(NULL, "gp5");
 
 	if (IS_ERR(vreg_ldo23)) {
-		printk(KERN_ERR "%s:  vreg23 get failed (%ld)\n",
-			__func__, PTR_ERR(vreg_ldo23));
+		pr_err("%s:  vreg23 get failed (%ld)\n", __func__, PTR_ERR(vreg_ldo23));
 		return rc;
 	}
 
 	rc = vreg_set_level(vreg_ldo23, 1200);
 	if (rc) {
-		printk(KERN_ERR "%s: vreg LDO23 set level failed (%d)\n",
-			__func__, rc);
+		pr_err("%s: vreg LDO23 set level failed (%d)\n", __func__, rc);
 		return rc;
 	}
 
@@ -2229,8 +2202,7 @@ static int hdmi_sii_panel_power(int on)
 		rc = vreg_disable(vreg_ldo23);
 
 	if (rc) {
-		printk(KERN_ERR "%s: LDO23 vreg enable failed (%d)\n",
-			__func__, rc);
+		pr_err("%s: LDO23 vreg enable failed (%d)\n", __func__, rc);
 		return rc;
 	}
 
@@ -2622,16 +2594,14 @@ int cyttsp_xres(void)
 
 	rc = gpio_direction_input(CYPRESS_TOUCH_GPIO_RESET);
 	if (rc) {
-		printk(KERN_ERR "%s: failed to set direction input, %d\n",
-		       __func__, rc);
+		pr_err("%s: failed to set direction input, %d\n", __func__, rc);
 		return -EIO;
 	}
 	polarity = gpio_get_value(CYPRESS_TOUCH_GPIO_RESET) & 0x01;
-	printk(KERN_INFO "%s: %d\n", __func__, polarity);
+	pr_info("%s: %d\n", __func__, polarity);
 	rc = gpio_direction_output(CYPRESS_TOUCH_GPIO_RESET, polarity ^ 1);
 	if (rc) {
-		printk(KERN_ERR "%s: failed to set direction output, %d\n",
-		       __func__, rc);
+		pr_err("%s: failed to set direction output, %d\n", __func__, rc);
 		return -EIO;
 	}
 	msleep(1);
@@ -2670,9 +2640,8 @@ int cyttsp_wakeup(void)
 
 	ret = gpio_direction_output(CYPRESS_TOUCH_GPIO_IRQ, 0);
 	if (ret) {
-		printk(KERN_ERR "%s: Failed to request gpio_direction_output\n",
-		__func__);
-                return ret;
+		pr_err("%s: Failed to request gpio_direction_output\n", __func__);
+		return ret;
 	}
 	msleep(50);
 	gpio_set_value(CYPRESS_TOUCH_GPIO_IRQ, 0);
@@ -2682,11 +2651,10 @@ int cyttsp_wakeup(void)
 	gpio_set_value(CYPRESS_TOUCH_GPIO_IRQ, 0);
 	msleep(1);
 	gpio_set_value(CYPRESS_TOUCH_GPIO_IRQ, 1);
-	printk(KERN_INFO "%s: wakeup\n", __func__);
+	pr_info("%s: wakeup\n", __func__);
 	ret = gpio_direction_input(CYPRESS_TOUCH_GPIO_IRQ);
 	if (ret) {
-		printk(KERN_ERR "%s: Failed to request gpio_direction_input\n",
-		__func__);
+		pr_err("%s: Failed to request gpio_direction_input\n", __func__);
 		return ret;
 	}
 	msleep(50);
@@ -3755,8 +3723,7 @@ static struct resource msm_fb_resources[] = {
 static int msm_fb_detect_panel(const char *name)
 {
 	if (!strcmp(name, "sii9024a")) {
-		printk(KERN_ERR
-			"[HDMI] msm_fb_detect_panel() : name(%s)\n", name);
+		pr_err("[HDMI] msm_fb_detect_panel() : name(%s)\n", name);
 		return 0;
 	}
 	return -ENODEV;
@@ -3905,39 +3872,33 @@ int simple_remote_pf_initialize_gpio(struct simple_remote_platform_data *data)
 	int i;
 
 	if (!data || -1 == data->headset_detect_enable_pin) {
-		printk(KERN_ERR
-		       "*** %s - Error: Invalid inparameter (GPIO Pins)."
-		       " Aborting!\n", __func__);
+		pr_err("*** %s - Error: Invalid inparameter (GPIO Pins). Aborting!\n", __func__);
 		return -EIO;
 	}
 
 	err = gpio_request(data->headset_detect_enable_pin,
 			   "Simple_remote_plug_detect_enable");
 	if (err) {
-		printk(KERN_CRIT "%s: Error %d - Request hs_detect_enable pin",
-		       __func__, err);
+		pr_crit("%s: Error %d - Request hs_detect_enable pin", __func__, err);
 		goto out;
 	}
 
 	err = gpio_direction_output(data->headset_detect_enable_pin, 1);
 	if (err) {
-		printk(KERN_CRIT "%s: Error %d - Set hs_detect_enable pin"
-		       " as output high\n", __func__, err);
+		pr_crit("%s: Error %d - Set hs_detect_enable pin as output high\n", __func__, err);
 		goto out_hs_det_enable;
 	}
 
 	err = gpio_request(data->headset_detect_read_pin,
 			   "Simple_remote_plug_detect_read");
 	if (err) {
-		printk(KERN_CRIT "%s - Error %d - Request hs-detect_read pin",
-		       __func__, err);
+		pr_crit("%s - Error %d - Request hs-detect_read pin", __func__, err);
 		goto out_hs_det_enable;
 	}
 
 	err = gpio_direction_input(data->headset_detect_read_pin);
 	if (err) {
-		printk(KERN_CRIT "%s - Error %d - Set hs-detect pin as input\n",
-		       __func__, err);
+		pr_crit("%s - Error %d - Set hs-detect pin as input\n", __func__, err);
 		goto out_hs_det_read;
 	}
 
@@ -3945,17 +3906,13 @@ int simple_remote_pf_initialize_gpio(struct simple_remote_platform_data *data)
 		err = gpio_request(data->headset_mode_switch_pin,
 				   "Simple_remote_headset_mode_switch");
 		if (err) {
-			printk(KERN_CRIT
-			       "%s - Error %d - Request hs-mode_switch pin",
-			       __func__, err);
+			pr_crit("%s - Error %d - Request hs-mode_switch pin", __func__, err);
 			goto out_hs_det_read;
 		}
 
 		err = gpio_direction_output(data->headset_mode_switch_pin, 0);
 		if (err) {
-			printk(KERN_CRIT
-			       "%s - Error %d - Set hs-mode_switch pin as "
-			       "input\n", __func__, err);
+			pr_crit("%s - Error %d - Set hs-mode_switch pin as input\n", __func__, err);
 			goto out_hs_mode_switch;
 		}
 	}
@@ -3963,8 +3920,7 @@ int simple_remote_pf_initialize_gpio(struct simple_remote_platform_data *data)
 	for (i = 0; i < data->num_regs; i++) {
 		data->regs[i].reg = vreg_get(NULL, data->regs[i].name);
 		if (IS_ERR(data->regs[i].reg)) {
-			printk(KERN_ERR "%s - Failed to find regulator %s\n",
-			       __func__, data->regs[i].name);
+			pr_err("%s - Failed to find regulator %s\n", __func__, data->regs[i].name);
 			err = PTR_ERR(data->regs[i].reg);
 			if (0 <= data->headset_mode_switch_pin)
 				goto out_hs_mode_switch;
@@ -4255,7 +4211,7 @@ static void qup_i2c_gpio_config(int adap_id, int config_type)
 		qup_i2c_table = qup_i2c_gpios_io;
 	rc = msm_gpios_enable(qup_i2c_table, 2);
 	if (rc < 0)
-		printk(KERN_ERR "QUP GPIO enable failed: %d\n", rc);
+		pr_err("QUP GPIO enable failed: %d\n", rc);
 #if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
 	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
 	if (qup_vreg) {
@@ -4452,9 +4408,7 @@ static void wlan_init_seq(void)
 	/* than we have far bigger issues as this is the base call for */
 	/* config of gpio's */
 	if (rc)
-		printk(KERN_ERR
-		       "%s: gpio_tlmm_config(%#x)=%d\n",
-		       __func__, wifi_init_gpio_en[0], rc);
+		pr_err("%s: gpio_tlmm_config(%#x)=%d\n", __func__, wifi_init_gpio_en[0], rc);
 
 	/* Set device in low VIO-leakage state according to spec */
 	/* This is done by toggle WLAN_EN OFF/ON/OFF (pulse width > 10ms) */
@@ -4719,12 +4673,6 @@ static void __init msm7x30_init(void)
 
 	msm_spm_init(&msm_spm_data, 1);
 	acpuclk_init(&acpuclk_7x30_soc_data);
-
-//	if (SOCINFO_VERSION_MAJOR(soc_version) >= 2 &&
-//			SOCINFO_VERSION_MINOR(soc_version) >= 1) {
-//		pr_debug("%s: SOC Version:2.(1 or more)\n", __func__);
-//		msm_otg_pdata.ldo_set_voltage = 0;
-//	}
 	semc_chg_usb_set_supplicants(semc_chg_usb_supplied_to,
 				  ARRAY_SIZE(semc_chg_usb_supplied_to));
 	if (0 <= CONFIG_USB_HS_DRV_AMPLITUDE ||
@@ -4809,7 +4757,7 @@ static void __init msm7x30_init(void)
 
 	boot_reason = *(unsigned int *)
 		(smem_get_entry(SMEM_POWER_ON_STATUS_INFO, &smem_size));
-	printk(KERN_NOTICE "Boot Reason = 0x%02x\n", boot_reason);
+	pr_notice("Boot Reason = 0x%02x\n", boot_reason);
 }
 
 static unsigned pmem_sf_size = MSM_PMEM_SF_SIZE;
@@ -4944,8 +4892,7 @@ static void __init msm7x30_map_io(void)
 	msm_shared_ram_phys = 0x00100000;
 	msm_map_msm7x30_io();
 	if (socinfo_init() < 0)
-		printk(KERN_ERR "%s: socinfo_init() failed!\n",
-		       __func__);
+		pr_err("%s: socinfo_init() failed!\n", __func__);
 }
 
 static void __init msm7x30_init_early(void)

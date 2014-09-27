@@ -298,6 +298,7 @@ void mdp4_blt_xy_update(struct mdp4_overlay_pipe *pipe)
 	int bpp;
 	char *overlay_base;
 
+
 	if (pipe->blt_addr == 0)
 		return;
 

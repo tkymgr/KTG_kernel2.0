@@ -1,4 +1,4 @@
-/* Copyright (c) 2009, 2011 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2009, 2011 Code Aurora Forum. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -181,6 +181,8 @@ static struct pmic_ctrl pmic_ctrl = {
 
 /* Add newer versions at the top of array */
 static const unsigned int rpc_vers[] = {
+	PMIC_RPC_VER_6_1,
+	PMIC_RPC_VER_5_1,
 	PMIC_RPC_VER_3_1,
 	PMIC_RPC_VER_2_1,
 	PMIC_RPC_VER_1_1,
@@ -366,6 +368,7 @@ static int pmic_rpc_req_reply(struct pmic_buf *tbuf, struct pmic_buf *rbuf,
 
 	if (len <= 0) {
 		printk(KERN_ERR "%s: rpc failed! len = %d\n", __func__, len);
+		pm->endpoint = NULL;	/* re-connect later ? */
 		return len;
 	}
 

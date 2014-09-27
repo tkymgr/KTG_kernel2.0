@@ -208,9 +208,4 @@ void msm_fb_config_backlight(struct msm_fb_data_type *mfd);
 void fill_black_screen(void);
 void unfill_black_screen(void);
 
-#ifdef CONFIG_FB_MSM_LOGO
-#define INIT_IMAGE_FILE "/logo.rle"
-int load_565rle_image(char *filename);
-#endif
-
 #endif /* MSM_FB_H */
