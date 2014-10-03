@@ -699,8 +699,8 @@ static struct msm_ssbi_platform_data msm7x30_ssbi_pm8058_pdata = {
 static uint32_t camera_off_gpio_table[] = {
 	/* parallel CAMERA interfaces */
 	GPIO_CFG(0,  0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_2MA), /* RST */
-#if !defined(CONFIG_SEMC_CAMERA_MODULE)
-#if !defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN)
+#if !defined(CONFIG_SEMC_CAM_SUB)
 #ifndef CONFIG_TIMPANI_CODEC
 	GPIO_CFG(1,  0, GPIO_CFG_OUTPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* VCM */
 #endif
@@ -708,7 +708,7 @@ static uint32_t camera_off_gpio_table[] = {
 	GPIO_CFG(3,  0, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT3 */
 #endif
 #endif
-#if defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_SUB)
 	GPIO_CFG(4,  0, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT4 */
 	GPIO_CFG(5,  0, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT5 */
 	GPIO_CFG(6,  0, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT6 */
@@ -722,7 +722,7 @@ static uint32_t camera_off_gpio_table[] = {
 	GPIO_CFG(14, 0, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* VSYNC_IN */
 #endif
 	GPIO_CFG(15, 0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_2MA), /* MCLK */
-#if defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_SUB)
 	GPIO_CFG(31, 0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_2MA), /* CAM_VGA_RST_N */
 #endif
 };
@@ -730,8 +730,8 @@ static uint32_t camera_off_gpio_table[] = {
 static uint32_t camera_on_gpio_table[] = {
 	/* parallel CAMERA interfaces */
 	GPIO_CFG(0,  0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_2MA), /* RST */
-#if !defined(CONFIG_SEMC_CAMERA_MODULE)
-#if !defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN)
+#if !defined(CONFIG_SEMC_CAM_SUB)
 #ifndef CONFIG_TIMPANI_CODEC
 	GPIO_CFG(1,  0, GPIO_CFG_OUTPUT, GPIO_CFG_PULL_UP, GPIO_CFG_2MA), /* VCM */
 #endif
@@ -739,7 +739,7 @@ static uint32_t camera_on_gpio_table[] = {
 	GPIO_CFG(3,  1, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT3 */
 #endif
 #endif
-#if defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_SUB)
 	GPIO_CFG(4,  1, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT4 */
 	GPIO_CFG(5,  1, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT5 */
 	GPIO_CFG(6,  1, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* DAT6 */
@@ -753,7 +753,7 @@ static uint32_t camera_on_gpio_table[] = {
 	GPIO_CFG(14, 1, GPIO_CFG_INPUT, GPIO_CFG_PULL_DOWN, GPIO_CFG_2MA), /* VSYNC_IN */
 #endif
 	GPIO_CFG(15, 1, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_6MA), /* MCLK */
-#if defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_SUB)
 	GPIO_CFG(31, 0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_2MA), /* CAM_VGA_RST_N */
 #endif
 };
@@ -808,7 +808,7 @@ struct msm_camera_device_platform_data msm_camera_device_data = {
 	.ioext.csiphy = 0xA6100000,
 	.ioext.csisz  = 0x00000400,
 	.ioext.csiirq = INT_CSI,
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 	.ioclk.mclk_clk_rate = 8000000,
 	.ioclk.vfe_clk_rate  = 192000000,
 #else
@@ -817,14 +817,14 @@ struct msm_camera_device_platform_data msm_camera_device_data = {
 #endif
 };
 
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 static struct msm_camera_sensor_flash_data flash_none = {
 	.flash_type = MSM_CAMERA_FLASH_NONE,
 	.flash_src  = NULL
  };
 #endif
 
-#ifdef CONFIG_SEMC_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_MAIN
 static struct msm_camera_sensor_info msm_camera_sensor_semc_camera_data = {
 	.sensor_name      = "semc_camera",
 	.sensor_reset     = 0,
@@ -872,7 +872,7 @@ static struct platform_device msm_camera_sensor_semc_camera = {
 };
 #endif
 
-#ifdef CONFIG_SEMC_SUB_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_SUB
 static struct msm_camera_sensor_info msm_camera_sensor_semc_sub_camera_data = {
 	.sensor_name      = "semc_sub_camera",
 	.sensor_reset     = 0,
@@ -965,7 +965,7 @@ static struct platform_device msm_vpe_device = {
 #endif
 #if defined(CONFIG_SEMC_VPE1)
 static struct platform_device semc_vpe1_device = {
-	.name		= "semc_vpe1",
+	.name		= "msm_vpe_standalone",
 	.id		= 0,
 	.num_resources	= ARRAY_SIZE(msm_vpe_resources),
 	.resource	= msm_vpe_resources,
@@ -3242,13 +3242,12 @@ static struct i2c_board_info mogami_qup_i2c_devices[] __initdata = {
 		.type = "bma150"
 	},
 #endif
-#ifdef CONFIG_SEMC_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_MAIN
 	{
 		I2C_BOARD_INFO("semc_camera", 0x1A),
-		.type = "semc_camera"
 	},
 #endif
-#ifdef CONFIG_SEMC_SUB_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_SUB
 	{
 		I2C_BOARD_INFO("semc_sub_camera", 0x3D),
 		.type = "semc_sub_camera"
@@ -4110,10 +4109,10 @@ static struct platform_device *devices[] __initdata = {
 	&qup_device_i2c,
 	&msm_kgsl_3d0,
 	&msm_kgsl_2d0,
-#ifdef CONFIG_SEMC_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_MAIN
 	&msm_camera_sensor_semc_camera,
 #endif
-#ifdef CONFIG_SEMC_SUB_CAMERA_MODULE
+#ifdef CONFIG_SEMC_CAM_SUB
 	&msm_camera_sensor_semc_sub_camera,
 #endif
 	&msm_device_uart3,
@@ -4212,8 +4211,8 @@ static void qup_i2c_gpio_config(int adap_id, int config_type)
 	rc = msm_gpios_enable(qup_i2c_table, 2);
 	if (rc < 0)
 		pr_err("QUP GPIO enable failed: %d\n", rc);
-#if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
-	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN) && \
+	!defined(CONFIG_SEMC_CAM_SUB)
 	if (qup_vreg) {
 		int rc = vreg_set_level(qup_vreg, 1800);
 		if (rc) {
@@ -4259,7 +4258,7 @@ static void __init msm_device_i2c_2_init(void)
 }
 
 static struct msm_i2c_platform_data qup_i2c_pdata = {
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 	.clk_freq = 100000,
 #else
 	.clk_freq = 384000,

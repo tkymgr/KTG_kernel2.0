@@ -358,7 +358,7 @@ void msm_camio_clk_set_min_rate(struct clk *clk, int rate)
 	clk_set_rate(clk, rate);
 }
 
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 void msm_camio_cam_mclk_enable(int rate)
 {
 	struct clk *clk = NULL;
@@ -501,8 +501,8 @@ void msm_camio_disable(struct platform_device *pdev)
 		release_mem_region(camio_ext.csiphy, camio_ext.csisz);
 	}
 	msm_camio_clk_disable(CAMIO_VFE_PBDG_CLK);
-#if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
-	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN) && \
+	!defined(CONFIG_SEMC_CAM_SUB)
 	msm_camio_clk_disable(CAMIO_CAM_MCLK_CLK);
 #endif
 }
@@ -592,8 +592,8 @@ int msm_camio_probe_off(struct platform_device *pdev)
 	struct msm_camera_sensor_info *sinfo = pdev->dev.platform_data;
 	struct msm_camera_device_platform_data *camdev = sinfo->pdata;
 	camdev->camera_gpio_off();
-#if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
-	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN) && \
+	!defined(CONFIG_SEMC_CAM_SUB)
 	return msm_camio_clk_disable(CAMIO_CAM_MCLK_CLK);
 #else
 	return 0;
@@ -608,8 +608,8 @@ int msm_camio_sensor_clk_on(struct platform_device *pdev)
 	camio_clk = camdev->ioclk;
 	camio_ext = camdev->ioext;
 	camdev->camera_gpio_on();
-#if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
-	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN) && \
+	!defined(CONFIG_SEMC_CAM_SUB)
 	msm_camio_clk_enable(CAMIO_CAM_MCLK_CLK);
 #endif
 	msm_camio_clk_enable(CAMIO_CAMIF_PAD_PBDG_CLK);
@@ -647,8 +647,8 @@ int msm_camio_sensor_clk_off(struct platform_device *pdev)
 	struct msm_camera_sensor_info *sinfo = pdev->dev.platform_data;
 	struct msm_camera_device_platform_data *camdev = sinfo->pdata;
 	camdev->camera_gpio_off();
-#if !defined(CONFIG_SEMC_CAMERA_MODULE) && \
-	!defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if !defined(CONFIG_SEMC_CAM_MAIN) && \
+	!defined(CONFIG_SEMC_CAM_SUB)
 	rc = msm_camio_clk_disable(CAMIO_CAM_MCLK_CLK);
 #endif
 	rc = msm_camio_clk_disable(CAMIO_CAMIF_PAD_PBDG_CLK);

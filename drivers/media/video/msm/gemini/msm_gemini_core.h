@@ -34,7 +34,7 @@ int msm_gemini_core_fe_start(void);
 void msm_gemini_core_release(int);
 void msm_gemini_core_init(void);
 
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 struct msm_gemini_core_buf *msm_gemini_core_get_we_nonactive_buffer(void);
 #endif
 #endif /* MSM_GEMINI_CORE_H */

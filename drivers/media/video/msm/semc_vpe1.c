@@ -22,7 +22,7 @@
 #include <mach/clk.h>
 #include <asm/div64.h>
 
-#define MSM_VPE_NAME "msm_vpe_standalone"
+#define MSM_VPE_NAME "msm_vpe"
 /*
 #undef CDBG
 #define CDBG(fmt, args...) pr_info(fmt, ##args)
@@ -91,6 +91,7 @@ static void vpe_reset_state_variables(void)
 	spin_lock_init(&vpe_ctrl->state_lock);
 	INIT_LIST_HEAD(&vpe_ctrl->tasklet_q);
 	init_waitqueue_head(&vpe_ctrl->wait);
+	INIT_LIST_HEAD(&vpe_ctrl->pmem_buf);
 }
 
 static int vpe_reset(void)
@@ -1039,7 +1040,7 @@ static int semc_vpe_probe(struct platform_device *pdev)
 
 	return rc;  /* this rc should be zero.*/
 
-	/* cdev_del(&vpe_device->cdev); */ /* this path should never occur */
+	cdev_del(&vpe_device->cdev); /* this path should never occur */
 
 /* from this part it is error handling. */
 vpe_device_destroy:
@@ -1076,7 +1077,7 @@ static struct platform_driver semc_vpe_driver = {
 	.probe	= semc_vpe_probe,
 	.remove	= semc_vpe_remove,
 	.driver	= {
-		.name = "semc_vpe1",
+		.name = "msm_vpe_standalone",
 		.owner = THIS_MODULE,
 	},
 };

@@ -292,6 +292,7 @@ struct msm_camvfe_fn {
 	int (*vfe_disable)(struct camera_enable_cmd *,
 			struct platform_device *dev);
 	void (*vfe_release)(struct platform_device *);
+	void (*vfe_stop)(void);
 };
 
 struct msm_camvfe_params {
@@ -639,7 +640,7 @@ void msm_camio_clk_rate_set(int rate);
 int msm_camio_vfe_clk_rate_set(int rate);
 void msm_camio_clk_rate_set_2(struct clk *clk, int rate);
 void msm_camio_clk_set_min_rate(struct clk *clk, int rate);
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 void msm_camio_cam_mclk_enable(int rate);
 #endif
 void msm_camio_clk_axi_rate_set(int rate);

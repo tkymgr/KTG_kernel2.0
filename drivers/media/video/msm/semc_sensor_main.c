@@ -1,4 +1,4 @@
-/* drivers/media/video/msm/semc_sensor_main.c
+/* drivers/media/video/msm/semc_camera_module.c
  *
  * Copyright (C) 2012 Sony Mobile Communications AB.
  *
@@ -23,6 +23,11 @@
 #include <media/msm_camera.h>
 #include <mach/gpio.h>
 #include <mach/camera.h>
+#include "semc_camera_module.h"
+
+#define I2C_NAME "semc_camera"
+#define GPIO_NAME "semc_camera"
+#define MSM_CAMERA_NAME "msm_camera_semc_camera"
 
 #ifdef ENABLE_LOGE
 #define LOGE(dev, f, a...)	dev_dbg(dev, "CAM0 E: %s: " f, __func__, ##a)
@@ -52,10 +57,10 @@
 #define MODULE_SOD08BN0		"SOD08BN0"
 #define MODULE_SOD08BN1		"SOD08BN1"
 
-#define VREG_L1			"8058_l1"
-#define VREG_LVS0		"8058_lvs0"
-#define VREG_L15		"8058_l15"
-#define VREG_L9			"8058_l9"
+#define VREG_L1			"gp15"
+#define VREG_LVS0		"lvsw1"
+#define VREG_L15		"gp2"
+#define VREG_L9			"gp10"
 
 enum semc_cam_cmd {
 	VREG_SD,
@@ -540,7 +545,7 @@ static int semc_cam_ctrl_config(void __user *argp)
 	}
 
 	switch (cdata.cfgtype) {
-	case CFG_SET_WRITE_CMD:
+	case CFG_I2C_WRITE:
 		slave_addr = cdata.cfg.i2c_io.slave_addr;
 		addr = cdata.cfg.i2c_io.address;
 		type = cdata.cfg.i2c_io.address_type;
@@ -561,7 +566,7 @@ static int semc_cam_ctrl_config(void __user *argp)
 		if (IS_ERR_VALUE(rc))
 			goto exit;
 		break;
-	case CFG_SET_READ_CMD:
+	case CFG_I2C_READ:
 		slave_addr = cdata.cfg.i2c_io.slave_addr;
 		addr = cdata.cfg.i2c_io.address;
 		type = cdata.cfg.i2c_io.address_type;
@@ -582,7 +587,7 @@ static int semc_cam_ctrl_config(void __user *argp)
 			goto exit;
 		}
 		break;
-	case CFG_SET_GPIO_CTRL:
+	case CFG_GPIO_CTRL:
 		if (cdata.cfg.gpio_ctrl.gpio == SENSOR_GPIO_CTRL_RESET) {
 			rc = semc_cam_gpio_set(
 				ctrl->inf->sensor_reset,
@@ -593,29 +598,30 @@ static int semc_cam_ctrl_config(void __user *argp)
 		if (IS_ERR_VALUE(rc))
 			goto exit;
 		break;
-	case CFG_SET_CSI_CTRL:
+	case CFG_CSI_CTRL:
 		csi_params.lane_cnt    =
-			cdata.cfg.csi_ctrl.csid_params.lane_cnt;
+			cdata.cfg.csi_ctrl.lane_cnt;
 		csi_params.lane_assign =
-			cdata.cfg.csi_ctrl.csid_params.lane_assign;
+			cdata.cfg.csi_ctrl.lane_assign;
 		csi_params.dpcm_scheme = 0;
 		csi_params.settle_cnt  =
-			cdata.cfg.csi_ctrl.csiphy_params.settle_cnt;
-
+			cdata.cfg.csi_ctrl.settle_cnt;
+#if 0
 		if (SENSOR_CSI_DECODE_8BIT ==
-			cdata.cfg.csi_ctrl.csid_params.lut_params.num_cid)
+			cdata.cfg.csi_ctrl.lut_params.num_cid)
 			csi_params.data_format = CSI_8BIT;
 		else if (SENSOR_CSI_DECODE_10BIT ==
-			cdata.cfg.csi_ctrl.csid_params.lut_params.num_cid)
+			cdata.cfg.csi_ctrl.lut_params.num_cid)
 			csi_params.data_format = CSI_10BIT;
 		else
+#endif
 			csi_params.data_format = CSI_10BIT;
 
 		rc = msm_camio_csi_config(&csi_params);
 		if (IS_ERR_VALUE(rc))
 			goto exit;
 		break;
-	case CFG_GET_ROM:
+	case CFG_ROM_READ:
 		rom_offset = cdata.cfg.rom_in.address;
 		rom_len = cdata.cfg.rom_in.length;
 		if (!rom_len || rom_offset >= ROM_MAX_DATA_LEN) {
@@ -689,7 +695,7 @@ static int __exit semc_cam_remove(struct i2c_client *client)
 }
 
 static const struct i2c_device_id semc_cam_id[] = {
-	{ "semc_sensor_main", 0 },
+	{ "semc_camera", 0 },
 	{ }
 };
 
@@ -698,7 +704,7 @@ static struct i2c_driver semc_cam_driver = {
 	.probe		= semc_cam_probe,
 	.remove		= __exit_p(semc_cam_remove),
 	.driver		= {
-		.name	= "semc_sensor_main",
+		.name	= "semc_camera",
 	},
 };
 
@@ -732,7 +738,7 @@ static int semc_camera_module_probe(struct platform_device *pdev)
 static struct platform_driver semc_camera_module_driver = {
 	.probe		= semc_camera_module_probe,
 	.driver		= {
-		.name	= "msm_camera_semc_sensor_main",
+		.name	= MSM_CAMERA_NAME,
 		.owner	= THIS_MODULE,
 	},
 };

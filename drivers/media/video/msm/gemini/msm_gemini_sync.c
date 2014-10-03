@@ -255,7 +255,7 @@ void msm_gemini_err_irq(struct msm_gemini_device *pgmn_dev,
 	GMN_PR_ERR("%s:%d] error: %d\n", __func__, __LINE__, event);
 
 	buf.vbuf.type = MSM_GEMINI_EVT_ERR;
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 	if (event == MSM_GEMINI_HW_IRQ_STATUS_WE_Y_BUFFER_OVERFLOW_MASK)
 		buf.vbuf.type = MSM_GEMINI_EVT_BUFFER_OVER;
 #endif
@@ -305,7 +305,7 @@ int msm_gemini_we_pingpong_irq(struct msm_gemini_device *pgmn_dev,
 	return rc;
 }
 
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 int msm_gemini_re_register_we_buf(struct msm_gemini_core_buf *buf_out)
 {
 	int rc = 0;
@@ -545,7 +545,7 @@ int msm_gemini_irq(int event, void *context, void *data)
 {
 	struct msm_gemini_device *pgmn_dev =
 		(struct msm_gemini_device *) context;
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 	struct msm_gemini_core_buf *we_buf;
 #endif
 
@@ -553,7 +553,7 @@ int msm_gemini_irq(int event, void *context, void *data)
 	case MSM_GEMINI_HW_MASK_COMP_FRAMEDONE:
 		msm_gemini_framedone_irq(pgmn_dev, data);
 		msm_gemini_we_pingpong_irq(pgmn_dev, data);
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 		we_buf = msm_gemini_core_get_we_nonactive_buffer();
 		if (we_buf) {
 			msm_gemini_q_in_buf(&pgmn_dev->output_rtn_q, we_buf);
@@ -567,7 +567,7 @@ int msm_gemini_irq(int event, void *context, void *data)
 		break;
 
 	case MSM_GEMINI_HW_MASK_COMP_WE:
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 		if (data)
 			msm_gemini_re_register_we_buf(data);
 		msm_gemini_err_irq(pgmn_dev,

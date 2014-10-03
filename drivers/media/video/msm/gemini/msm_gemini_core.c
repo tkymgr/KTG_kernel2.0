@@ -84,7 +84,7 @@ void msm_gemini_core_init(void)
 	spin_lock_init(&reset_lock);
 }
 
-#if defined(CONFIG_SEMC_CAMERA_MODULE) || defined(CONFIG_SEMC_SUB_CAMERA_MODULE)
+#if defined(CONFIG_SEMC_CAM_MAIN) || defined(CONFIG_SEMC_CAM_SUB)
 struct msm_gemini_core_buf *msm_gemini_core_get_we_nonactive_buffer()
 {
 	struct msm_gemini_hw_buf *buf_p;
